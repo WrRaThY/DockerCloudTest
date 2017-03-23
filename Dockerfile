@@ -10,14 +10,17 @@ RUN git clone https://github.com/WrRaThY/DockerCloudTest.git /home/DockerCloudTe
 
 #resolve dependancies and compile the code
 WORKDIR /home/DockerCloudTest
-RUN ["mvn", "dependency:resolve"]
-RUN ["mvn", "install"]
+ADD pom.xml /home/DockerCloudTest/pom.xml
+RUN cd /home/DockerCloudTest && mvn dependency:go-offline
+
+ADD . /home/DockerCloudTest
+RUN ["mvn", "package"]
 
 #copy fatjar to a separate folder
 RUN cp /home/DockerCloudTest/target/DockerCloudTest-0.0.1-SNAPSHOT.jar /home/
 
 #delete the code
-WORKDIR /home/DockerCloudTest
+WORKDIR /home
 RUN ["rm", "-rf", "DockerCloudTest"]
 
 #expose default spring boot port
