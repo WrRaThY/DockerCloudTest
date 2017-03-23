@@ -14,7 +14,7 @@ public class TestController {
         this.animalFinder = animalFinder;
     }
 
-    @GetMapping(value = "blaaaa", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(value = "bla", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     String returnBla() {
         return "{\"bla\": \"blaa\"}";
     }
