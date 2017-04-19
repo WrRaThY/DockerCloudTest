@@ -1,0 +1,32 @@
+# Use base Java JDK light image
+FROM anapsix/alpine-java:8_jdk
+
+# Set build directory
+WORKDIR /app/codebase
+
+# Copy all the project codebase
+ADD . ./
+
+# Clean and build project
+RUN ./gradlew clean build
+
+# Copy jar to app directory
+RUN bash -c 'cp build/libs/job-offers-0.0.1.jar ../app.jar'
+
+# Set run directory
+WORKDIR /app
+
+# Remove build directory
+RUN bash -c 'rm -rf codebase'
+
+# Update created date
+RUN bash -c 'touch app.jar'
+
+# Define application name
+ENV app_name "Job offers app"
+
+# Expose default application port
+EXPOSE 8080
+
+# Run application as a Java jar application
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","app.jar"]

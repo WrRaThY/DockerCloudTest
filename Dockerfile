@@ -1,19 +1,20 @@
-FROM java:8-jdk
+FROM maven:latest
 
-RUN apt-get update
+RUN mkdir --parents /home/DockerCloudTest
 
-#install maven
-RUN apt-get install -y maven
+VOLUME "/usr/share/maven/ref/repository/"
 
-#get the code
-RUN git clone https://github.com/WrRaThY/DockerCloudTest.git /home/DockerCloudTest
-
-#resolve dependancies and compile the code
+#resolve dependancies
 WORKDIR /home/DockerCloudTest
-ADD pom.xml /home/DockerCloudTest/pom.xml
+COPY pom.xml ./
+
+#RUN cd /home/DockerCloudTest && mvn dependency:go-offline
+#RUN mvn -B -f /home/DockerCloudTest/pom.xml -s /usr/share/maven/ref/settings-docker.xml dependency:resolve
+#RUN cd /home/DockerCloudTest && mvn dependency:go-offline --fail-never
 RUN cd /home/DockerCloudTest && mvn dependency:go-offline
 
-ADD . /home/DockerCloudTest
+#compile the code (build fatjar)
+ADD . ./
 RUN ["mvn", "package"]
 
 #copy fatjar to a separate folder
@@ -29,3 +30,5 @@ EXPOSE 8080
 #run this damn thing
 RUN update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
 CMD ["java", "-jar", "/home/DockerCloudTest-0.0.1-SNAPSHOT.jar"]
+
+#https://keyholesoftware.com/2015/01/05/caching-for-maven-docker-builds/
